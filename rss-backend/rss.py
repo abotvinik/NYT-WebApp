@@ -18,7 +18,7 @@ def translate_text(text):
         print('Exception', e)
         return text
 
-@app.route('/rss')
+@app.route('/rss/en')
 def fetch_rss(lang='en'):
     article_feed = feedparser.parse(RSS_URL)
 
@@ -42,16 +42,18 @@ def fetch_rss(lang='en'):
         if lang == 'es':
             title = translate_text(article.title)
             description = translate_text(article.description)
+            author = article.author.replace(' and ', ' y ')
         else:
             title = article.title
             description = article.description
+            author = article.author
         
         articles.append({
             'title': title,
             'link': article.link,
             'description': description,
             'date': article.get('published', ''),
-            'author': article.get('author', ''),
+            'author': author,
             'image' : {
                 'height' : image_height,
                 'width' : image_width,
