@@ -1,19 +1,35 @@
 from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 import feedparser
+from googletrans import Translator
 
 app = Flask(__name__)
 CORS(app)
 
+translator = Translator()
+
 RSS_URL = 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml'
 
+def translate_text(text):
+    try:
+        translation = translator.translate(text, dest='es').text
+        return translation
+    except Exception as e:
+        print('Exception', e)
+        return text
+
 @app.route('/rss')
-def fetch_rss():
+def fetch_rss(lang='en'):
     article_feed = feedparser.parse(RSS_URL)
 
     logo = article_feed.feed.image.url
     title = article_feed.feed.title
     link = article_feed.feed.link
+    date = article_feed.feed.published
+
+    if lang == 'es':
+        title = translate_text(title)
+        date = translate_text(date)
 
     articles = []
     for article in article_feed.entries:
@@ -22,11 +38,18 @@ def fetch_rss():
             image_height = article.media_content[0]['height']
             image_width = article.media_content[0]['width']
             image = article.media_content[0]['url']
+
+        if lang == 'es':
+            title = translate_text(article.title)
+            description = translate_text(article.description)
+        else:
+            title = article.title
+            description = article.description
         
         articles.append({
-            'title': article.title,
+            'title': title,
             'link': article.link,
-            'description': article.description,
+            'description': description,
             'date': article.get('published', ''),
             'author': article.get('author', ''),
             'image' : {
@@ -37,7 +60,11 @@ def fetch_rss():
             }
         })
 
-    return jsonify({'logo': logo, 'title': title, 'link': link, 'articles': articles})
+    return jsonify({'date': date, 'logo': logo, 'title': title, 'link': link, 'articles': articles})
+
+@app.route('/rss/es')
+def fetch_rss_es():
+    return fetch_rss('es')
 
 @app.route('/')
 def index():
