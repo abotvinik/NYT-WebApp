@@ -10,6 +10,14 @@ translator = Translator()
 
 RSS_URL = 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml'
 
+from datetime import datetime
+
+def reformat_date(date_string):
+    
+    parsed_date = datetime.strptime(date_string, '%a, %d %b %Y %H:%M:%S %z')
+    formatted_date = parsed_date.strftime('%Y-%m-%d')
+    return formatted_date
+
 def translate_text(text):
     try:
         translation = translator.translate(text, dest='es').text
@@ -52,7 +60,7 @@ def fetch_rss(lang='en'):
             'title': title,
             'link': article.link,
             'description': description,
-            'date': article.get('published', ''),
+            'date': reformat_date(article.get('published', '')),
             'author': author,
             'image' : {
                 'height' : image_height,

@@ -28,14 +28,32 @@ const ArticleImage = styled.img`
   max-height: 200px;
 `;
 
+const Date = styled.p`
+  font-size: 14px;
+  color: #888;
+`;
+
+const Title = styled.h2`
+  margin: 0;
+`;
+
+const Description = styled.p`
+  margin: 0;
+`;
+
+const Author = styled.p`
+  font-style: italic;
+  color: #888;
+`;
+
 const ArticleItem = ({ article }) => (
   <ArticleLink href={article.link} target="_blank" rel="noopener noreferrer">
     <ArticleContainer>
       <ArticleText>
-        <p>{article.published}</p>
-        <h2>{article.title}</h2>
-        <p>{article.description}</p>
-        <p>{article.author}</p>
+        <Date>{article.date}</Date>
+        <Title>{article.title}</Title>
+        <Description>{article.description}</Description>
+        <Author>{article.author}</Author>
       </ArticleText>
       {article.image && <ArticleImage src={article.image.url} alt={article.title} />}
     </ArticleContainer>
