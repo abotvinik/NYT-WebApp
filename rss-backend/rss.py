@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template
 from flask_cors import CORS
+from flask_caching import Cache
 import feedparser
 from googletrans import Translator
 
@@ -7,6 +8,11 @@ app = Flask(__name__)
 CORS(app)
 
 translator = Translator()
+
+cache = Cache(app, config={
+        'CACHE_TYPE': 'simple',
+        'CACHE_DEFAULT_TIMEOUT': 900
+    })
 
 RSS_URL = 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml'
 
@@ -27,6 +33,7 @@ def translate_text(text):
         return text
 
 @app.route('/rss/en')
+@cache.cached(timeout=900)
 def fetch_rss(lang='en'):
     article_feed = feedparser.parse(RSS_URL)
 
@@ -73,6 +80,7 @@ def fetch_rss(lang='en'):
     return jsonify({'date': date, 'logo': logo, 'title': title, 'link': link, 'articles': articles})
 
 @app.route('/rss/es')
+@cache.cached(timeout=900)
 def fetch_rss_es():
     return fetch_rss('es')
 
