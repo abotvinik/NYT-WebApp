@@ -1,3 +1,7 @@
+/*
+  Simple header using data from the API response.
+ */
+
 import React from 'react';
 import styled from 'styled-components';
 import LanguageToggle from './LanguageToggle';

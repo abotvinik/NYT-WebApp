@@ -1,3 +1,7 @@
+/*
+  This component is used to display a single article, recieved as prop from ArticleList. 
+ */
+
 import React from 'react';
 import styled from 'styled-components';
 

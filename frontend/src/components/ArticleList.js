@@ -1,9 +1,15 @@
+/*
+  Processes the API response and displays the list of articles.
+  Also sends article metadata to the Header component.
+ */
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ArticleItem from './ArticleItem';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Header from './Header';
+import config from '../config.json';
 
 const ListContainer = styled.div`
   max-width: 800px;
@@ -20,7 +26,7 @@ const ArticleList = () => {
     const fetchArticles = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/rss/${i18n.language}`);
+        const response = await axios.get(`${config.api_url}${i18n.language}`);
         setArticles(response.data.articles);
         setLogo(response.data.logo);
       } catch (error) {
