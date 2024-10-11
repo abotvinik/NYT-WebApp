@@ -17,7 +17,7 @@ const LanguageToggle = () => {
 
   return (
     <LanguageContainer onClick={switchLanguage}>
-      ENG | ESP
+      Toggle Language
     </LanguageContainer>
   );
 };

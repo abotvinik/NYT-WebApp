@@ -7,7 +7,6 @@ import ArticleList from './components/ArticleList';  // Adjust path as needed
 // Container for the whole app
 const AppContainer = styled.div`
   font-family: Arial, sans-serif;
-  
   margin: 0 auto;
   padding: 20px;
   background-color: #f1f1f1;

@@ -38,7 +38,7 @@ const Title = styled.h2`
 `;
 
 const Description = styled.p`
-  margin: 0;
+  margin: 10px 0;
 `;
 
 const Author = styled.p`
