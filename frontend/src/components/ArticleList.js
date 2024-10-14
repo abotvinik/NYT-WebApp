@@ -25,8 +25,16 @@ const ArticleList = () => {
     const fetchArticles = async () => {
       setLoading(true);
       try {
+        const source = axios.CancelToken.source();
+        const timeoutId = setTimeout(() => {
+          source.cancel("Timeout");
+          setLoading(false);
+        }, 60000);
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL;
+        console.log('Backend URL: ', backendUrl);
         const response = await axios.get(`${backendUrl}/${i18n.language}`);
+        clearTimeout(timeoutId);
         setArticles(response.data.articles);
         setLogo(response.data.logo);
       } catch (error) {

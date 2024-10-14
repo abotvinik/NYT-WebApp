@@ -5,8 +5,7 @@ from flask import Flask, jsonify, render_template, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_caching import Cache
 import feedparser
-from googletrans import Translator
-import json
+from google.cloud import translate_v2 as translate
 from dotenv import load_dotenv
 import os
 
@@ -16,14 +15,17 @@ CORS(
         resources={r"/*": {"origins": ["http://localhost:3000", "https://nyt-webapp-d825b46890e5.herokuapp.com"]}}
     )
 
-translator = Translator()
+load_dotenv()
+
+google_api_key = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+translator = translate.Client()
 
 cache = Cache(app, config={
         'CACHE_TYPE': 'simple',
         'CACHE_DEFAULT_TIMEOUT': 900
     })
 
-load_dotenv()
+
 
 # CONFIG_FILE = './config.json'
 
@@ -45,8 +47,9 @@ def reformat_date(date_string):
 # Translate text to a given language
 def translate_text(text, language='es'):
     try:
-        translation = translator.translate(text, dest=language).text
-        return translation
+        translation = translator.translate(text, target_language=language)
+        print('Translation:', translation)
+        return translation['translatedText']
     except Exception as e:
         print('Exception', e)
         return text
@@ -80,6 +83,7 @@ def fetch_rss(lang='en'):
 
             # Extract Translated Article Data if necessary
             if lang == 'es':
+                print('Translating Article')
                 title = translate_text(article.title)
                 description = translate_text(article.description)
                 author = article.author.replace(' and ', ' y ')
@@ -113,6 +117,7 @@ def fetch_rss(lang='en'):
 @cache.cached(timeout=900)
 @cross_origin()
 def fetch_rss_es():
+    print('Fetching Spanish')
     return fetch_rss('es')
 
 @app.route('/')
