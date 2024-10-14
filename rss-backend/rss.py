@@ -1,14 +1,16 @@
 # Backend for RSS Feed Reader
 # Handles RSS Feed Fetching, Translation, and Caching
 
-from flask import Flask, jsonify, render_template
-from flask_cors import CORS
+from flask import Flask, jsonify, render_template, send_from_directory
+from flask_cors import CORS, cross_origin
 from flask_caching import Cache
 import feedparser
 from googletrans import Translator
 import json
+from dotenv import load_dotenv
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/build')
 CORS(app)
 
 translator = Translator()
@@ -18,13 +20,15 @@ cache = Cache(app, config={
         'CACHE_DEFAULT_TIMEOUT': 900
     })
 
-CONFIG_FILE = './config.json'
+load_dotenv()
 
-def get_config():
-    with open(CONFIG_FILE) as f:
-        return json.load(f)
+# CONFIG_FILE = './config.json'
 
-config = get_config()
+# def get_config():
+#     with open(CONFIG_FILE) as f:
+#         return json.load(f)
+
+# config = get_config()
     
 
 from datetime import datetime
@@ -47,8 +51,9 @@ def translate_text(text, language='es'):
 # English RSS feed and RSS processing
 @app.route('/rss/en')
 @cache.cached(timeout=900)
+@cross_origin()
 def fetch_rss(lang='en'):
-    article_feed = feedparser.parse(config['rss_feed'])
+    article_feed = feedparser.parse(os.environ['RSS_URL'])
 
     # Extract feed metadata
     logo = article_feed.feed.get('image', {}).get('url', 'No logo available')
@@ -103,13 +108,15 @@ def fetch_rss(lang='en'):
 # Spanish RSS feed
 @app.route('/rss/es')
 @cache.cached(timeout=900)
+@cross_origin()
 def fetch_rss_es():
     return fetch_rss('es')
 
-# Tester route
 @app.route('/')
-def index():
-    return render_template('tester.html')
+@cross_origin()
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

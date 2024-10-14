@@ -1,0 +1,1 @@
+web: gunicorn rss-backend.rss:app
