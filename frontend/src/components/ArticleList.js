@@ -9,7 +9,6 @@ import ArticleItem from './ArticleItem';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Header from './Header';
-import config from '../config.json';
 
 const ListContainer = styled.div`
   max-width: 800px;
@@ -26,7 +25,8 @@ const ArticleList = () => {
     const fetchArticles = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${config.api_url}${i18n.language}`);
+        const backendUrl = process.env.REACT_APP_BACKEND_URL;
+        const response = await axios.get(`${backendUrl}/${i18n.language}`);
         setArticles(response.data.articles);
         setLogo(response.data.logo);
       } catch (error) {

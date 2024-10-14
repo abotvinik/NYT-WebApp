@@ -10,8 +10,11 @@ import json
 from dotenv import load_dotenv
 import os
 
-app = Flask(__name__, static_folder='../frontend/build')
-CORS(app)
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
+CORS(
+        app,
+        resources={r"/*": {"origins": ["http://localhost:3000", "https://nyt-webapp-d825b46890e5.herokuapp.com"]}}
+    )
 
 translator = Translator()
 
