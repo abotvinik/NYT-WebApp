@@ -7,7 +7,9 @@ from flask_caching import Cache
 import feedparser
 from google.cloud import translate_v2 as translate
 from dotenv import load_dotenv
+from datetime import datetime
 import os
+import tempfile
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
 CORS(
@@ -17,26 +19,23 @@ CORS(
 
 load_dotenv()
 
-google_api_key = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+# Google Needs API Credential As JSON File
+google_api_key = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+if google_api_key is None:
+    # Locally just load the json file name
+    google_api_key = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+else:
+    # Create Temp File Using ENV Contents if File not Present (i.e. for Deployment)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp:
+        temp.write(google_api_key.encode('utf-8'))
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp.name
+
 translator = translate.Client()
 
 cache = Cache(app, config={
         'CACHE_TYPE': 'simple',
         'CACHE_DEFAULT_TIMEOUT': 900
     })
-
-
-
-# CONFIG_FILE = './config.json'
-
-# def get_config():
-#     with open(CONFIG_FILE) as f:
-#         return json.load(f)
-
-# config = get_config()
-    
-
-from datetime import datetime
 
 # Parse date to format YYYY-MM-DD
 def reformat_date(date_string):
@@ -80,6 +79,13 @@ def fetch_rss(lang='en'):
                 image_height = article.media_content[0]['height']
                 image_width = article.media_content[0]['width']
                 image = article.media_content[0]['url']
+            
+            # Backup Image
+            else:
+                image_type = 'image'
+                image_height = os.environ['BACKUP_IMG_H']
+                image_width = os.environ['BACKUP_IMG_W']
+                image = os.environ['BACKUP_IMG']
 
             # Extract Translated Article Data if necessary
             if lang == 'es':
