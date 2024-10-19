@@ -31,7 +31,7 @@ const ArticleList = () => {
           setLoading(false);
         }, 60000);
 
-        const backendUrl = process.env.REACT_APP_BACKEND_URL;
+        const backendUrl = `${window.location.href}/rss`;
         console.log('Backend URL: ', backendUrl);
         const response = await axios.get(`${backendUrl}/${i18n.language}`);
         clearTimeout(timeoutId);

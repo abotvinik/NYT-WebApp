@@ -47,7 +47,6 @@ def reformat_date(date_string):
 def translate_text(text, language='es'):
     try:
         translation = translator.translate(text, target_language=language)
-        print('Translation:', translation)
         return translation['translatedText']
     except Exception as e:
         print('Exception', e)
@@ -89,7 +88,6 @@ def fetch_rss(lang='en'):
 
             # Extract Translated Article Data if necessary
             if lang == 'es':
-                print('Translating Article')
                 title = translate_text(article.title)
                 description = translate_text(article.description)
                 author = article.author.replace(' and ', ' y ')
