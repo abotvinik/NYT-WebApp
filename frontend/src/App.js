@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import ArticleList from './components/ArticleList';  // Adjust path as needed
+import ArticleList from './components/ArticleList';
 
 // Container for the whole app
 const AppContainer = styled.div`

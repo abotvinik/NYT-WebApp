@@ -53,8 +53,8 @@ const ArticleList = () => {
         {loading ? (
           <p>Loading articles...</p>
         ) : (
-          articles.map((article, index) => (
-            <ArticleItem key={index} article={article} />
+          articles.map((article) => (
+            <ArticleItem article={article}/>
           ))
         )}
       </ListContainer>
