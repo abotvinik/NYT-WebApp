@@ -21,7 +21,11 @@ const LanguageToggle = () => {
 
   return (
     <LanguageContainer onClick={switchLanguage}>
-      Toggle Language
+      {i18n.language === 'es' ? (
+        <>ENG | <strong>ESP</strong></>
+      ) : (
+        <><strong>ENG</strong> | ESP</>
+      )}
     </LanguageContainer>
   );
 };
