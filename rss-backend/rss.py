@@ -57,7 +57,27 @@ def translate_text(text, language='es'):
 @cache.cached(timeout=900)
 @cross_origin()
 def fetch_rss(lang='en'):
-    article_feed = feedparser.parse(os.environ['RSS_URL'])
+    try:
+        article_feed = feedparser.parse(os.environ['RSS_URL'])
+        if article_feed.bozo == 1:
+            raise Exception('Feed is not well-formed XML')
+    except Exception as e:
+        print('Error Fetching RSS: ', e)
+        articles = []
+        articles.append({
+            'title': 'Error al obtener la fuente RSS' if lang == 'es' else 'Error Fetching RSS Feed',
+            'link': os.environ['BACKUP_LINK'],
+            'description': 'Por favor, inténtelo de nuevo más tarde' if lang == 'es' else 'Please try again later',
+            'date': '',
+            'author': '',
+            'image' : {
+                'height' : os.environ['BACKUP_IMG_H'],
+                'width' : os.environ['BACKUP_IMG_W'],
+                'type' : 'image',
+                'url' : os.environ['BACKUP_IMG']
+            }
+        })
+        return jsonify({'date': '', 'logo': os.environ['BACKUP_LOGO'], 'title': 'Error', 'link': os.environ['BACKUP_LINK'], 'articles': articles})
 
     # Extract feed metadata
     logo = article_feed.feed.get('image', {}).get('url', 'No logo available')
@@ -90,17 +110,21 @@ def fetch_rss(lang='en'):
             if lang == 'es':
                 title = translate_text(article.title)
                 description = translate_text(article.description)
+                # Translate 'and' locally to save API calls
                 author = article.author.replace(' and ', ' y ')
             else:
                 title = article.title
                 description = article.description
                 author = article.author
             
+            link = article.link
+            date = reformat_date(article.get('published', ''))
+            
             articles.append({
                 'title': title,
-                'link': article.link,
+                'link': link,
                 'description': description,
-                'date': reformat_date(article.get('published', '')),
+                'date': date,
                 'author': author,
                 'image' : {
                     'height' : image_height,
@@ -128,7 +152,6 @@ def fetch_rss_es():
 @cross_origin()
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
